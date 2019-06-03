@@ -14,6 +14,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const path = require("path")
 app.use('/', express.static(path.join(__dirname, 'build')));
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Authorization, Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+
+    if ('OPTIONS' === req.method) {
+        console.log("Allowing OPTIONS");
+        res.send(200);
+    }
+    else {
+        next();
+    }
+});
+
 /*** Database ***/
 mongoose.connect(process.env.CONNECTION_STRING, {useNewUrlParser: true});
 const connection = mongoose.connection;
