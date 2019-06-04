@@ -42,12 +42,7 @@ export default class AddJob extends Component {
             category: this.state.category,
             area: this.state.area
         })
-
         this.props.history.push("/");
-    }
-
-    componentDidUpdate() {
-
     }
 
     render() {

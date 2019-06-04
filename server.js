@@ -6,12 +6,12 @@ require('dotenv').config();
 console.log(require('dotenv').config());
 
 const mongoose = require('mongoose');
-
+const checkJwt = require('express-jwt');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const path = require("path")
+const path = require("path");
 app.use('/', express.static(path.join(__dirname, 'build')));
 
 app.use((req, res, next) => {
@@ -25,6 +25,20 @@ app.use((req, res, next) => {
     }
     else {
         next();
+    }
+});
+
+// Open paths that does not need login
+let openPaths = [
+    '/'
+];
+// Validate the user using authentication
+app.use(
+    checkJwt({ secret: process.env.JWT_SECRET }).unless({ path : openPaths})
+);
+app.use((err, req, res) => {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({ error: err.message });
     }
 });
 
@@ -60,11 +74,16 @@ app.post('/add-job', (req, res) => {
     newJob
         .save()
         .then(answer => res.json(answer));
-    res.redirect('/')
 });
+
+/****** Routes ******/
+const users = require('./models/user.model');
+let usersRouter = require('./routers/login_router')(users.find());
+app.use('/users', usersRouter);
+
 
 
 // /*** Error handling ***/
-// app.use(function (err, req, res) {
+// app.use(function (err, req, res, next) {
 //     res.status(500).send({msg: 'Something broke! ' + err})
 // });

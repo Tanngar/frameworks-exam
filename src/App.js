@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import JobsList from "./components/JobsList";
-import Login from "./components/AddJob";
+import AddJob from "./components/AddJob";
+import Login from "./components/Login";
+
 const axios = require('axios');
 
 class App extends Component {
@@ -36,6 +38,7 @@ class App extends Component {
           });
         })
         .catch(function(error){
+
         })
   }
 
@@ -56,13 +59,16 @@ class App extends Component {
               </div>
             </nav>
             <br/>
-            {/*<JobsList jobs={this.state.data}/>*/}
             <Switch>
               <Route exact path={'/'}
                      render={(props) =>
                          <JobsList {...props} jobs={this.state.data}/>}
               />
               <Route exact path={'/add-job'}
+                     render={(props) =>
+                         <AddJob {...props}/>}
+              />
+              <Route exact path={'/login'}
                      render={(props) =>
                          <Login {...props}/>}
               />

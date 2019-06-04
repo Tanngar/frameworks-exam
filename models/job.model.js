@@ -6,6 +6,6 @@ const jobSchema = new Schema({
     description: String,
     category: String,
     area: String
-} , { collection: 'jobs' });
+});
 
 module.exports = mongoose.model('job', jobSchema);
