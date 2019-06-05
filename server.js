@@ -58,10 +58,34 @@ app.listen(PORT, function () {
 
 const jobs = require('./models/job.model');
 
-app.get('/', (req, res) => {
-    jobs.find()
-        .then(jobs => res.json(jobs))
+app.post('/', (req, res) => {
+    // console.log(req.body.selectedCategories);
+    if(req.body.selectedCategories != undefined) {
+        jobs.find({
+            $or:[
+                { category: { $in: req.body.selectedCategories }}, { area: { $in: req.body.selectedCategories }}
+            ]}
+        )
+            .then(jobs => res.json(jobs))
+    } else {
+        jobs.find()
+            .then(jobs => res.json(jobs))
+    }
 });
+
+// app.get('/', (req, res) => {
+//     if(req.body.selectedCategories != undefined) {
+//         jobs.find({
+//             $or:[
+//                 { category: { $in: req.body.selectedCategories }}, { area: { $in: req.body.selectedCategories }}
+//             ]}
+//         )
+//         .then(jobs => res.json(jobs))
+//     } else {
+//         jobs.find()
+//             .then(jobs => res.json(jobs))
+//     }
+// });
 
 app.get('/add-job', eJwt({secret: process.env.JWT_SECRET}), (req, res) => {
     res.send('Access granted');

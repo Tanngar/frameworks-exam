@@ -10,20 +10,20 @@ import Authentication from './components/Authentication';
 const axios = require('axios');
 
 class App extends Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      data: []
-    };
+        this.state = {
+            data: [],
+            filters: []
+        };
 
-    this.Auth = new Authentication();
-    this.handleLogout = this.handleLogout.bind(this);
-
+        this.Auth = new Authentication();
+        this.handleLogout = this.handleLogout.bind(this);
   }
 
   componentDidMount() {
-    axios.get("http://localhost:8080/")
+    axios.post("http://localhost:8080/")
         .then( res => {
           this.setState({
             data: res.data
@@ -36,16 +36,17 @@ class App extends Component {
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    axios.get("http://localhost:8080/")
+    axios.post("http://localhost:8080/")
         .then( res => {
           this.setState({
             data: res.data
           });
         })
         .catch(function(error){
-
+            console.log(error)
         })
   }
+
 
   handleLogout(){
       window.location.reload();
