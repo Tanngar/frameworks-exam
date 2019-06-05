@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Authentication from "./Authentication";
 const axios = require('axios');
 
 export default class AddJob extends Component {
@@ -12,8 +13,15 @@ export default class AddJob extends Component {
             area: String
         }
 
+        this.Auth = new Authentication();
+
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+    }
+
+    componentWillMount(){
+        if(!this.Auth.loggedIn())
+            this.props.history.replace('/login');
     }
 
     // componentDidMount() {

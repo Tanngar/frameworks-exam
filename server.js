@@ -6,13 +6,13 @@ require('dotenv').config();
 console.log(require('dotenv').config());
 
 const mongoose = require('mongoose');
-const checkJwt = require('express-jwt');
+const eJwt = require('express-jwt');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const path = require("path");
-app.use('/', express.static(path.join(__dirname, 'build')));
+// const path = require("path");
+// app.use('/', express.static(path.join(__dirname, 'build')));
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -27,20 +27,21 @@ app.use((req, res, next) => {
         next();
     }
 });
+// http://localhost:8080/users/login
+// let openPaths = [
+//     '/login',
+//     '/users/login'
+// ];
 
-// Open paths that does not need login
-let openPaths = [
-    '/'
-];
-// Validate the user using authentication
-app.use(
-    checkJwt({ secret: process.env.JWT_SECRET }).unless({ path : openPaths})
-);
-app.use((err, req, res) => {
-    if (err.name === 'UnauthorizedError') {
-        res.status(401).json({ error: err.message });
-    }
-});
+// app.use(
+//     eJwt({ secret: process.env.JWT_SECRET }).unless({ path : openPaths})
+// );
+
+// app.use((err, req, res) => {
+//     if (err.name === 'UnauthorizedError') {
+//         res.redirect('/login');
+//     }
+// });
 
 /*** Database ***/
 mongoose.connect(process.env.CONNECTION_STRING, {useNewUrlParser: true});
@@ -56,9 +57,14 @@ app.listen(PORT, function () {
 });
 
 const jobs = require('./models/job.model');
+
 app.get('/', (req, res) => {
     jobs.find()
         .then(jobs => res.json(jobs))
+});
+
+app.get('/add-job', eJwt({secret: process.env.JWT_SECRET}), (req, res) => {
+    res.send('Access granted');
 });
 
 app.post('/add-job', (req, res) => {
@@ -69,7 +75,6 @@ app.post('/add-job', (req, res) => {
         category: req.body.category,
         area: req.body.area
     });
-    console.log(newJob);
 
     newJob
         .save()
@@ -77,13 +82,19 @@ app.post('/add-job', (req, res) => {
 });
 
 /****** Routes ******/
-const users = require('./models/user.model');
-let usersRouter = require('./routers/login_router')(users.find());
-app.use('/users', usersRouter);
-
+let loginRouter = require('./routers/login_router');
+app.use('/users', loginRouter);
 
 
 // /*** Error handling ***/
-// app.use(function (err, req, res, next) {
+// app.use(function (err, req, res) {
+//     console.error(err);
 //     res.status(500).send({msg: 'Something broke! ' + err})
 // });
+
+app.use((err, req, res, next) => {
+    console.log("Error status: " + err.status);
+    if (err.status == 401) {
+        res.redirect('/users/login');
+    }
+});

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Authentication from './Authentication';
 const axios = require('axios');
 const jwtDecode = require('jwt-decode');
 
@@ -6,11 +7,13 @@ const jwtDecode = require('jwt-decode');
 export default class Login extends Component {
 
     constructor(match, props) {
-        super(props);
+        super();
         this.state = {
             username: String,
             password: String,
+            error: null
         }
+        this.Auth = new Authentication();
 
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -18,43 +21,33 @@ export default class Login extends Component {
 
     onSubmit(e){
         e.preventDefault();
-        axios.post('http://localhost:8080/users/login', {
-            method: 'post',
-            data: {
-                username: this.state.username,
-                password: this.state.password
-            },
-            headers: {
-                Authorization: 'Bearer ' + this.getToken()
+        this.Auth.login(this.state.username, this.state.password).then(res =>{
+            console.log(res.msg);
+            if(res.msg) {
+                this.state.error = res.msg;
             }
-        }).then(res => {
-            this.setToken(res.token);
-            console.log("Token: " + res.token);
-            return Promise.resolve(res);
+            if(this.Auth.loggedIn()){
+                this.props.history.replace('/');
+            }
         })
+            .catch(err =>{
+                alert(err);
+            })
+        // axios.post('http://localhost:8080/users/login', {
+        //     username: this.state.username,
+        //     password: this.state.password
+        // }).then(res => {
+        //     console.log(res.token);
+        //     this.setToken(res.token);
+        //     return Promise.resolve(res);
+        // })
+
         // this.props.history.push("/");
     }
 
-    setToken(token) {
-        localStorage.setItem('token', token)
-    }
-
-    getToken() {
-        return localStorage.getItem('token')
-    }
-
-    logout() {
-        localStorage.removeItem('token');
-    }
-
-    loggedIn() {
-        // TODO: Check if token is expired using 'jwt-decode'
-        // TODO: npm install jwt-decode
-        if (jwtDecode(this.getToken()).exp < Date.now() / 1000) {
-            this.logout();
-        }
-
-        return (this.getToken() !== undefined);
+    componentWillMount(){
+        if(this.Auth.loggedIn())
+            this.props.history.replace('/');
     }
 
     onChange(e) {
@@ -64,10 +57,19 @@ export default class Login extends Component {
         });
     }
 
+    displayError(){
+        if(this.state.error != null) {
+            return(
+                <div className="alert alert-danger">{ this.state.error }</div>
+            )
+        }
+    }
+
     render() {
         return (
             <div>
-                <h3>Post new job offer</h3>
+                <h3>Login</h3>
+                { this.displayError()}
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label><h6 className={"m-0"}>Username: </h6></label>
