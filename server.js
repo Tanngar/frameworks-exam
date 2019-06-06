@@ -58,19 +58,38 @@ app.listen(PORT, function () {
 
 const jobs = require('./models/job.model');
 
+app.post('/get-filters', (req, res) => {
+    jobs.find()
+        .then(jobs => res.json(jobs))
+});
+
+app.post('/get-filtered-jobs', (req, res) => {
+    console.log(req.body.filters);
+    jobs.find({
+        $or:[
+            { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
+        ]})
+        .then(data => res.json(data))
+        .catch(error => {
+            console.log(error);
+        });
+});
+
+
 app.post('/', (req, res) => {
-    // console.log(req.body.selectedCategories);
-    if(req.body.selectedCategories != undefined) {
-        jobs.find({
-            $or:[
-                { category: { $in: req.body.selectedCategories }}, { area: { $in: req.body.selectedCategories }}
-            ]}
-        )
+    jobs.find()
             .then(jobs => res.json(jobs))
-    } else {
-        jobs.find()
-            .then(jobs => res.json(jobs))
-    }
+    // console.log(req.body);
+    // if(req.body.filters != undefined && req.body.filters.length > 0) {
+    //     jobs.find({
+    //         $or:[
+    //             { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
+    //         ]})
+    //         .then(data => res.json(data))
+    // } else {
+    //     jobs.find()
+    //         .then(jobs => res.json(jobs))
+    // }
 });
 
 // app.get('/', (req, res) => {

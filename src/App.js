@@ -28,24 +28,23 @@ class App extends Component {
           this.setState({
             data: res.data
           });
-          console.log(res.data);
         })
         .catch(function(error){
           console.log(error)
         })
   };
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    axios.post("http://localhost:8080/")
-        .then( res => {
-          this.setState({
-            data: res.data
-          });
-        })
-        .catch(function(error){
-            console.log(error)
-        })
-  }
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   axios.post("http://localhost:8080/")
+  //       .then( res => {
+  //         this.setState({
+  //           data: res.data
+  //         });
+  //       })
+  //       .catch(function(error){
+  //           console.log(error)
+  //       })
+  // }
 
 
   handleLogout(){
@@ -111,7 +110,7 @@ class App extends Component {
                 />
                 <Route exact path={'/'}
                      render={(props) =>
-                         <JobsList {...props} jobs={this.state.data}/>}
+                         <JobsList {...props}/>}
                 />
             </Switch>
           </div>
