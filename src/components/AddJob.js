@@ -4,13 +4,14 @@ const axios = require('axios');
 
 export default class AddJob extends Component {
 
-    constructor(match, props) {
+    constructor(props) {
         super(props);
         this.state = {
             title: String,
             description: String,
             category: String,
-            area: String
+            area: String,
+            message: null
         }
 
         this.Auth = new Authentication();
@@ -23,17 +24,6 @@ export default class AddJob extends Component {
         if(!this.Auth.loggedIn())
             this.props.history.replace('/login');
     }
-
-    // componentDidMount() {
-    //     fetch(`${this.API_URL}/questions/`+ this.props.match.params.id)
-    //         .then(res => res.json())
-    //         .then((data) => {
-    //             this.setState({
-    //                 title: data[0].title,
-    //                 description: data[0].description,
-    //             })
-    //         })
-    // }
 
     onChange(e) {
         console.log(e.target.name + " " + e.target.value);
@@ -49,14 +39,36 @@ export default class AddJob extends Component {
             description: this.state.description,
             category: this.state.category,
             area: this.state.area
-        });
-        this.props.history.push("/");
+        })
+            .then(res => {
+                console.log(res.data.message.length);
+                if(res.data.message.length > 0) {
+                    this.setState({message: res.data.message }, () => console.log(this.state.message));
+                }
+            });
+        var inputFields = document.getElementsByTagName("input");
+        for(let i=0;i < inputFields.length; i++){
+            if(inputFields[i].type == "text") {
+                inputFields[i].value = "";
+            }
+        }
+        console.log(inputFields);
+    }
+
+    displayError(){
+        console.log(this.state.message);
+        if(this.state.message != null) {
+            return(
+                <div className="alert alert-success">{ this.state.message }</div>
+            )
+        }
     }
 
     render() {
         return (
             <div>
                 <h3>Post new job offer</h3>
+                { this.displayError()}
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label><h6 className={"m-0"}>Title: </h6></label>

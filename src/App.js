@@ -20,7 +20,8 @@ class App extends Component {
 
         this.Auth = new Authentication();
         this.handleLogout = this.handleLogout.bind(this);
-  }
+        this.rerenderCallback = this.rerenderCallback.bind(this);
+    }
 
   componentDidMount() {
     axios.post("http://localhost:8080/")
@@ -34,19 +35,6 @@ class App extends Component {
         })
   };
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   axios.post("http://localhost:8080/")
-  //       .then( res => {
-  //         this.setState({
-  //           data: res.data
-  //         });
-  //       })
-  //       .catch(function(error){
-  //           console.log(error)
-  //       })
-  // }
-
-
   handleLogout(){
       window.location.reload();
       this.Auth.logout();
@@ -56,10 +44,14 @@ class App extends Component {
       if(this.Auth.loggedIn()){
           return(
               <li className="navbar-item">
-                  <div onClick={ () => this.handleLogout()} className="nav-link">Log Out</div>
+                  <div style={{cursor: "pointer"}} onClick={ () => this.handleLogout()} className="nav-link">Log Out</div>
               </li>
           )
       }
+  }
+
+  rerenderCallback(){
+      this.setState(this.state)
   }
 
   renderAddJobButton(){
@@ -106,7 +98,7 @@ class App extends Component {
                 />
                 <Route exact path={'/login'}
                        render={(props) =>
-                           <Login {...props}/>}
+                           <Login {...props} rerenderParent={this.rerenderCallback}/>}
                 />
                 <Route exact path={'/'}
                      render={(props) =>

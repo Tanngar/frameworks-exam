@@ -77,19 +77,16 @@ app.post('/get-filtered-jobs', (req, res) => {
 
 
 app.post('/', (req, res) => {
-    jobs.find()
+    if(req.body.filters != undefined && req.body.filters.length > 0) {
+        jobs.find({
+            $or:[
+                { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
+            ]})
+            .then(data => res.json(data))
+    } else {
+        jobs.find()
             .then(jobs => res.json(jobs))
-    // console.log(req.body);
-    // if(req.body.filters != undefined && req.body.filters.length > 0) {
-    //     jobs.find({
-    //         $or:[
-    //             { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
-    //         ]})
-    //         .then(data => res.json(data))
-    // } else {
-    //     jobs.find()
-    //         .then(jobs => res.json(jobs))
-    // }
+    }
 });
 
 // app.get('/', (req, res) => {
@@ -121,7 +118,7 @@ app.post('/add-job', (req, res) => {
 
     newJob
         .save()
-        .then(answer => res.json(answer));
+        .then(res.json({ message: "Post added succesfully"}));
 });
 
 /****** Routes ******/

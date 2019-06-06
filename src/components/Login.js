@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import Authentication from './Authentication';
-const axios = require('axios');
-const jwtDecode = require('jwt-decode');
-
 
 export default class Login extends Component {
 
-    constructor(match, props) {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             username: String,
             password: String,
@@ -22,27 +19,17 @@ export default class Login extends Component {
     onSubmit(e){
         e.preventDefault();
         this.Auth.login(this.state.username, this.state.password).then(res =>{
-            console.log(res.msg);
             if(res.msg) {
-                this.state.error = res.msg;
+                this.setState({error:res.msg});
             }
             if(this.Auth.loggedIn()){
+                this.props.rerenderParent();
                 this.props.history.replace('/');
             }
         })
             .catch(err =>{
                 alert(err);
             })
-        // axios.post('http://localhost:8080/users/login', {
-        //     username: this.state.username,
-        //     password: this.state.password
-        // }).then(res => {
-        //     console.log(res.token);
-        //     this.setToken(res.token);
-        //     return Promise.resolve(res);
-        // })
-
-        // this.props.history.push("/");
     }
 
     componentWillMount(){
@@ -51,7 +38,6 @@ export default class Login extends Component {
     }
 
     onChange(e) {
-        console.log(e.target.name + " " + e.target.value);
         this.setState({
             [e.target.name]: e.target.value
         });

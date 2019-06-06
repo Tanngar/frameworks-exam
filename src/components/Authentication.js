@@ -1,15 +1,13 @@
 import jwtDecode from 'jwt-decode';
 class Authentication {
-    // Initializing important variables
     constructor() {
         this.apiUrl = 'http://localhost:8080/';
-        this.fetch = this.fetch.bind(this) // React binding stuff
-        this.login = this.login.bind(this)
+        this.fetch = this.fetch.bind(this);
+        this.login = this.login.bind(this);
         this.getProfile = this.getProfile.bind(this)
     }
 
     login(username, password) {
-        // Get a token from api server using the fetch api
         return this.fetch(this.apiUrl + 'users/login', {
             method: 'POST',
             body: JSON.stringify({
@@ -18,22 +16,21 @@ class Authentication {
             })
         }).then(res => {
             if(res.token) {
-                this.setToken(res.token) // Setting the token in localStorage
+                this.setToken(res.token)
             }
             return Promise.resolve(res);
         })
     }
 
     loggedIn() {
-        // Checks if there is a saved token and it's still valid
-        const token = this.getToken() // GEtting token from localstorage
-        return !!token && !this.isTokenExpired(token) // handwaiving here
+        const token = this.getToken();
+        return !!token && !this.isTokenExpired(token);
     }
 
     isTokenExpired(token) {
         try {
             const decoded = jwtDecode(token);
-            if (decoded.exp < Date.now() / 1000) { // Checking if token is expired. N
+            if (decoded.exp < Date.now() / 1000) {
                 return true;
             }
             else
@@ -45,34 +42,27 @@ class Authentication {
     }
 
     setToken(idToken) {
-        // Saves user token to localStorage
         localStorage.setItem('token', idToken)
     }
 
     getToken() {
-        // Retrieves the user token from localStorage
         return localStorage.getItem('token')
     }
 
     logout() {
-        // Clear user token and profile data from localStorage
         localStorage.removeItem('token');
     }
 
     getProfile() {
-        // Using jwt-decode npm package to decode the token
         return jwtDecode(this.getToken());
     }
 
     fetch(url, options) {
-        // performs api calls sending the required authentication headers
         const headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
 
-        // Setting Authorization header
-        // Authorization: Bearer xxxxxxx.xxxxxxxx.xxxxxx
         if (this.loggedIn()) {
             headers['Authorization'] = 'Bearer ' + this.getToken()
         }

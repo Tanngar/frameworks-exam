@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 export default class Job extends Component {
     // API_URL = process.env.REACT_APP_API;
 
-    constructor(match, props) {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             title: String,
