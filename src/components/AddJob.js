@@ -3,6 +3,7 @@ import Authentication from "./Authentication";
 const axios = require('axios');
 
 export default class AddJob extends Component {
+    API_URL = process.env.REACT_APP_API;
 
     constructor(props) {
         super(props);
@@ -26,7 +27,6 @@ export default class AddJob extends Component {
     }
 
     onChange(e) {
-        console.log(e.target.name + " " + e.target.value);
         this.setState({
             [e.target.name]: e.target.value
         });
@@ -34,29 +34,26 @@ export default class AddJob extends Component {
 
     onSubmit(e){
         e.preventDefault();
-        axios.post('http://localhost:8080/add-job', {
+        axios.post(this.API_URL + '/add-job', {
             title: this.state.title,
             description: this.state.description,
             category: this.state.category,
             area: this.state.area
         })
             .then(res => {
-                console.log(res.data.message.length);
                 if(res.data.message.length > 0) {
-                    this.setState({message: res.data.message }, () => console.log(this.state.message));
+                    this.setState({message: res.data.message });
                 }
             });
         var inputFields = document.getElementsByTagName("input");
         for(let i=0;i < inputFields.length; i++){
-            if(inputFields[i].type == "text") {
+            if(inputFields[i].type === "text") {
                 inputFields[i].value = "";
             }
         }
-        console.log(inputFields);
     }
 
     displayError(){
-        console.log(this.state.message);
         if(this.state.message != null) {
             return(
                 <div className="alert alert-success">{ this.state.message }</div>

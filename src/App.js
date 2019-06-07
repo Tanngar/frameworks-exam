@@ -6,8 +6,7 @@ import JobsList from "./components/JobsList";
 import AddJob from "./components/AddJob";
 import Login from "./components/Login";
 import Authentication from './components/Authentication';
-
-const axios = require('axios');
+import NotFound from './components/NotFound';
 
 class App extends Component {
     constructor(props) {
@@ -22,18 +21,6 @@ class App extends Component {
         this.handleLogout = this.handleLogout.bind(this);
         this.rerenderCallback = this.rerenderCallback.bind(this);
     }
-
-  componentDidMount() {
-    axios.post("http://localhost:8080/")
-        .then( res => {
-          this.setState({
-            data: res.data
-          });
-        })
-        .catch(function(error){
-          console.log(error)
-        })
-  };
 
   handleLogout(){
       window.location.reload();
@@ -103,6 +90,10 @@ class App extends Component {
                 <Route exact path={'/'}
                      render={(props) =>
                          <JobsList {...props}/>}
+                />
+                <Route
+                       render={(props) =>
+                           <NotFound {...props}/>}
                 />
             </Switch>
           </div>

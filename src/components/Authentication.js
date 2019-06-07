@@ -1,14 +1,17 @@
 import jwtDecode from 'jwt-decode';
+
 class Authentication {
+    API_URL = process.env.REACT_APP_API;
+
     constructor() {
-        this.apiUrl = 'http://localhost:8080/';
+
         this.fetch = this.fetch.bind(this);
         this.login = this.login.bind(this);
         this.getProfile = this.getProfile.bind(this)
     }
 
     login(username, password) {
-        return this.fetch(this.apiUrl + 'users/login', {
+        return this.fetch(this.API_URL + '/users/login', {
             method: 'POST',
             body: JSON.stringify({
                 username,

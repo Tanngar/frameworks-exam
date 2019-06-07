@@ -3,13 +3,13 @@ import Filter from "./Filter";
 const axios = require('axios');
 
 export default class FiltersList extends Component {
-    // API_URL = process.env.REACT_APP_API;
+    API_URL = process.env.REACT_APP_API;
 
     constructor(props) {
         super(props);
 
         this.state = {
-            selectedFilters: [],
+            filters: [],
             jobs: []
         };
 
@@ -20,7 +20,7 @@ export default class FiltersList extends Component {
     }
 
     componentDidMount() {
-        axios.post("http://localhost:8080/get-filters")
+        axios.post(this.API_URL + "/get-filters")
             .then( res => {
                 this.setState({
                     jobs: res.data
@@ -42,16 +42,18 @@ export default class FiltersList extends Component {
     }
 
     getFilter(filter){
-        let newFilters = this.state.selectedFilters;
+        let newFilters = this.state.filters;
         newFilters.push(filter);
-        this.setState({selectedFilters: newFilters});
-        this.props.getFilters(this.state.selectedFilters);
+        this.setState({filters: newFilters});
+        this.props.getFilters(this.state.filters);
     }
 
     removeFilter(filter){
-        let index = this.state.selectedFilters.indexOf(filter);
-        this.state.selectedFilters.splice(index, 1);
-        this.props.getFilters(this.state.selectedFilters);
+        let newFilters = this.state.filters;
+        let index = newFilters.indexOf(filter);
+        newFilters.splice(index, 1);
+        this.setState({filters: newFilters});
+        this.props.getFilters(this.state.filters);
     }
 
     render() {

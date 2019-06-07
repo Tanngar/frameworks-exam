@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
 
 export default class Filter extends Component {
-    // API_URL = process.env.REACT_APP_API;
-
     constructor(props) {
         super(props);
-
-        this.state = {
-            selectedCategories: []
-        };
 
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick(e) {
         if(e.target.classList.contains("selected")){
-            this.props.removeFilter(e.target.value);
+            this.props.removeFilter(e.target.innerHTML);
 
             e.target.classList.remove("selected");
             e.target.classList.add("btn-outline-dark");

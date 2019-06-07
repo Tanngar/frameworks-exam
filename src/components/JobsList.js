@@ -4,7 +4,7 @@ import FiltersList from "./FiltersList";
 const axios = require('axios');
 
 export default class JobList extends Component {
-    // API_URL = process.env.REACT_APP_API;
+    API_URL = process.env.REACT_APP_API;
 
     constructor(props) {
         super(props);
@@ -18,7 +18,7 @@ export default class JobList extends Component {
     }
 
     componentDidMount() {
-        axios.post("http://localhost:8080/",{
+        axios.post(this.API_URL + "/get-jobs",{
             filters: this.state.filters
         })
             .then( res => {
@@ -33,7 +33,7 @@ export default class JobList extends Component {
 
     getFilteredJobs(filters){
         this.setState({filters: filters}, function(){
-            axios.post("http://localhost:8080/", { filters: this.state.filters})
+            axios.post(this.API_URL + "/get-jobs", { filters: this.state.filters})
                 .then(res => {
                     this.setState({jobs: res.data })
                 })

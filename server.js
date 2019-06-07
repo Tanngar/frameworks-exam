@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = (process.env.PORT || 8080);
 
+
 require('dotenv').config();
 console.log(require('dotenv').config());
 
@@ -11,8 +12,8 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// const path = require("path");
-// app.use('/', express.static(path.join(__dirname, 'build')));
+const path = require("path");
+app.use('/', express.static(path.join(__dirname, 'build')));
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -27,21 +28,6 @@ app.use((req, res, next) => {
         next();
     }
 });
-// http://localhost:8080/users/login
-// let openPaths = [
-//     '/login',
-//     '/users/login'
-// ];
-
-// app.use(
-//     eJwt({ secret: process.env.JWT_SECRET }).unless({ path : openPaths})
-// );
-
-// app.use((err, req, res) => {
-//     if (err.name === 'UnauthorizedError') {
-//         res.redirect('/login');
-//     }
-// });
 
 /*** Database ***/
 mongoose.connect(process.env.CONNECTION_STRING, {useNewUrlParser: true});
@@ -58,56 +44,46 @@ app.listen(PORT, function () {
 
 const jobs = require('./models/job.model');
 
-app.post('/get-filters', (req, res) => {
+app.post('/api/get-filters', (req, res) => {
     jobs.find()
         .then(jobs => res.json(jobs))
 });
 
-app.post('/get-filtered-jobs', (req, res) => {
-    console.log(req.body.filters);
-    jobs.find({
-        $or:[
-            { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
-        ]})
-        .then(data => res.json(data))
-        .catch(error => {
-            console.log(error);
-        });
-});
-
-
-app.post('/', (req, res) => {
-    if(req.body.filters != undefined && req.body.filters.length > 0) {
+app.post('/api/get-jobs', (req, res) => {
+    if(req.body.filters != undefined && req.body.filters.length === 1) {
         jobs.find({
             $or:[
                 { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
             ]})
             .then(data => res.json(data))
+    } else if(req.body.filters != undefined && req.body.filters.length > 1) {
+        jobs.find({
+            $and:[
+                { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
+            ]})
+            .then(function(data){
+                if( data.length === 0) {
+                    jobs.find({
+                        $or:[
+                            { category: { $in: req.body.filters }}, { area: { $in: req.body.filters }}
+                        ]})
+                        .then(data => res.json(data))
+                } else {
+                res.json(data)
+                }
+            })
     } else {
         jobs.find()
             .then(jobs => res.json(jobs))
     }
 });
 
-// app.get('/', (req, res) => {
-//     if(req.body.selectedCategories != undefined) {
-//         jobs.find({
-//             $or:[
-//                 { category: { $in: req.body.selectedCategories }}, { area: { $in: req.body.selectedCategories }}
-//             ]}
-//         )
-//         .then(jobs => res.json(jobs))
-//     } else {
-//         jobs.find()
-//             .then(jobs => res.json(jobs))
-//     }
-// });
 
-app.get('/add-job', eJwt({secret: process.env.JWT_SECRET}), (req, res) => {
+app.get('/api/add-job', eJwt({secret: process.env.JWT_SECRET}), (req, res) => {
     res.send('Access granted');
 });
 
-app.post('/add-job', (req, res) => {
+app.post('/api/add-job', (req, res) => {
     let newJob = new jobs({
         _id: req.body._id,
         title: req.body.title,
@@ -121,20 +97,18 @@ app.post('/add-job', (req, res) => {
         .then(res.json({ message: "Post added succesfully"}));
 });
 
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
+
 /****** Routes ******/
 let loginRouter = require('./routers/login_router');
-app.use('/users', loginRouter);
+app.use('/api/users', loginRouter);
 
-
-// /*** Error handling ***/
-// app.use(function (err, req, res) {
-//     console.error(err);
-//     res.status(500).send({msg: 'Something broke! ' + err})
-// });
 
 app.use((err, req, res, next) => {
     console.log("Error status: " + err.status);
     if (err.status == 401) {
-        res.redirect('/users/login');
+        res.redirect('/');
     }
 });
