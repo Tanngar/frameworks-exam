@@ -1,4 +1,4 @@
-Exam assignment for frameworks course.
+## Exam assignment for frameworks course.
 
 The purpose of this assignment was to develop a “job site” where users can search for jobs in various categories and areas. As per requirements the website was built using technologies we have learn throughout the course, namely React, Express, Node and MongoDB. 
 
